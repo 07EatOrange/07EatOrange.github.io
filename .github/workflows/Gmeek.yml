@@ -55,20 +55,23 @@ jobs:
 
       - name: Generate new html
         run: |
+          # 把仓库文件复制到Gmeek目录
           cp -r ./* /opt/Gmeek/
+          # 进入Gmeek运行目录
           cd /opt/Gmeek
           
-          # 关键：在Gmeek自己的目录里创建backup和docs
+          # 关键：在Gmeek的运行目录里创建backup和docs文件夹
           mkdir -p backup
           mkdir -p docs
           
-          # 只有Issue事件才传issue_number，否则全局生成
+          # 处理不同触发方式
           if [ "${{ github.event_name }}" = "issues" ]; then
             python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number ${{ github.event.issue.number }}
           else
             python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }}
           fi
           
+          # 把生成的文件复制回工作区
           cp -a /opt/Gmeek/docs ${{ github.workspace }}
           cp -a /opt/Gmeek/backup ${{ github.workspace }}
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }}
